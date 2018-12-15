@@ -8,6 +8,7 @@ let vertices = [];
 let colors = [];
 let indices = [];
 let amountOfLines = 0;
+let e;
 
 function setup() {
     socket = io.connect('http://localhost:8080');
@@ -29,7 +30,7 @@ function setup() {
     // gl.colorMask(false, false, false, true);
 
     // Clear the canvas
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.6, 0.6, 0.6, 1.0);
 
     // Enable the depth test
     gl.enable(gl.DEPTH_TEST);
@@ -57,7 +58,25 @@ function setup() {
     if (!looping) {
         noLoop();
     }
-
+    e = new E({
+        x: 0,
+        y: 0,
+        angle: 0,
+        length: 100,
+        numBranches: 3,
+        angleBetween: TWO_PI /  6,
+        middle: true
+    });
+    es.push(e);
+    // e = new E({
+    //     x: 0,
+    //     y: 0,
+    //     angle: PI,
+    //     length: 100,
+    //     numBranches: 3,
+    //     angleBetween: TWO_PI /  6,
+    //     middle: true
+    // });
 }
 let ww;
 
@@ -71,18 +90,18 @@ function draw() {
     colors = [];
     indices = [];
 
-    let rectangle;
+    // let rectangle;
 
-    rectangle = makeQuad({
-        c: [0.0, 0.2, 0.7, 0.75],
-        v: [
-            [-2 + (Math.sin(t * 0.05) * osc), -2 + (Math.cos(t * 0.05) * osc)],
-            [2 + (Math.sin(t * 0.015) * osc), -2 + (Math.cos(t * 0.015) * osc)],
-            [2 + (Math.sin(t * 0.015) * osc), 2 + (Math.cos(t * 0.015) * osc)],
-            [-2 + (Math.sin(t * 0.05) * osc), 2 + (Math.cos(t * 0.05) * osc)]
-        ]
-    });
-    addRectangleToBuffers(rectangle);
+    // rectangle = makeQuad({
+    //     c: [0.0, 0.2, 0.7, 0.75],
+    //     v: [
+    //         [-2 + (Math.sin(t * 0.05) * osc), -2 + (Math.cos(t * 0.05) * osc)],
+    //         [2 + (Math.sin(t * 0.015) * osc), -2 + (Math.cos(t * 0.015) * osc)],
+    //         [2 + (Math.sin(t * 0.015) * osc), 2 + (Math.cos(t * 0.015) * osc)],
+    //         [-2 + (Math.sin(t * 0.05) * osc), 2 + (Math.cos(t * 0.05) * osc)]
+    //     ]
+    // });
+    // addRectangleToBuffers(rectangle);
     // let r = map(sin(frameCount * 0.15), -1, 1, 0, 1);
     // rectangle = makeQuad({
     //     c: [0.9, r, 1 - r, 1.0],
@@ -136,34 +155,41 @@ function draw() {
     //     makeLine(i + x, -0.5 + x1, i + x1, 0.5 + x);
     // }
 
-    lineOptions.weight = 0.001;
-    lineOptions.blurFactor = 0.01;
-    amountOfLines = 0;
-    let s = 0.01;
-    for (let i = 0; i < Math.PI * 100; i += 0.03) {
-        let blur = map(i, 0, Math.PI * 50, 0.01, 0.04);
-        let weight = map(i, 0, Math.PI * 50, 0.001, 0.02);
-        lineOptions.weight = weight;
-        lineOptions.blurFactor = blur;
-        let maxG = map(sin(frameCount * 0.01), -1, 1, 0, 1);
-        let r = map(i, 0, Math.PI * 50, 1.0, 0.5);
-        // r = map(sin(i * 0.1), -1, 1, 0.0, 1.0);
-        let g = map(i, 0, Math.PI * 50, 0.5, maxG);
-        let b = map(i, 0, Math.PI * 50, 0.0, 0.7);
-        lineOptions.r = r;
-        lineOptions.g = g;
-        lineOptions.b = b;
-        let x0 = cos(i * frameCount * 0.001) * cos(frameCount * 0.025 + i) * i * s;
-        let y0 = cos(i * frameCount * 0.001) * sin(frameCount * 0.025 + i) * i * s;
-        // let x1 = cos((i + 1) * frameCount * 0.0001) * cos(frameCount * 0.025 + i + 1) * (i + 1) * s * 0.25;
-        // let y1 = cos((i + 1) * frameCount * 0.0001) * sin(frameCount * 0.025 + i + 1) * (i + 1) * s * 0.25;
-        let x1 = x0 * 1.0015;
-        let y1 = y0 * 1.0015;
-        makeLine(x0 * 1, y0 * 1, x1 * 1, y1 * 1);
-        amountOfLines++;
+    // lineOptions.weight = 0.001;
+    // lineOptions.blurFactor = 0.01;
+    // amountOfLines = 0;
+    // let s = 0.01;
+    // for (let i = 0; i < Math.PI * 100; i += 0.03) {
+    //     let blur = map(i, 0, Math.PI * 50, 0.01, 0.04);
+    //     let weight = map(i, 0, Math.PI * 50, 0.001, 0.02);
+    //     lineOptions.weight = weight;
+    //     lineOptions.blurFactor = blur;
+    //     let maxG = map(sin(frameCount * 0.01), -1, 1, 0, 1);
+    //     let r = map(i, 0, Math.PI * 50, 1.0, 0.5);
+    //     // r = map(sin(i * 0.1), -1, 1, 0.0, 1.0);
+    //     let g = map(i, 0, Math.PI * 50, 0.5, maxG);
+    //     let b = map(i, 0, Math.PI * 50, 0.0, 0.7);
+    //     lineOptions.r = r;
+    //     lineOptions.g = g;
+    //     lineOptions.b = b;
+    //     let x0 = cos(i * frameCount * 0.001) * cos(frameCount * 0.025 + i) * i * s;
+    //     let y0 = cos(i * frameCount * 0.001) * sin(frameCount * 0.025 + i) * i * s;
+    //     // let x1 = cos((i + 1) * frameCount * 0.0001) * cos(frameCount * 0.025 + i + 1) * (i + 1) * s * 0.25;
+    //     // let y1 = cos((i + 1) * frameCount * 0.0001) * sin(frameCount * 0.025 + i + 1) * (i + 1) * s * 0.25;
+    //     let x1 = x0 * 1.0015;
+    //     let y1 = y0 * 1.0015;
+    //     makeLine(x0 * 1, y0 * 1, x1 * 1, y1 * 1);
+    //     amountOfLines++;
+    // }
+
+
+    // makeLine(0, 0, 1280 - 10, 800 - 10);
+
+
+    for (let i = 0; i < es.length; i++) {
+        // es[i].grow();
+        es[i].show();
     }
-
-
 
     // var vertices = [-0.75, 0.0, 0.0, -0.5, -0.5, 0.0,
     //     0.75, 0.0, 0.0, 0.5, 0.5, 0.0
@@ -253,6 +279,9 @@ function keyPressed() {
         if (key == 'p' || key == 'P') {
             frameExport();
         }
+        if (key == 'g' || key == 'G') {
+            grow();
+        }
         if (key == 'r' || key == 'R') {
             window.location.reload();
         }
@@ -260,4 +289,13 @@ function keyPressed() {
             redraw();
         }
     }
+}
+
+function grow() {
+    let numToGrow = es.length
+    for (let i = 0; i < numToGrow; i++) {
+        es[i].grow();
+    }
+    es = es.concat(esNext);
+    esNext = [];
 }
