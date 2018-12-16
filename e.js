@@ -56,9 +56,9 @@ E.prototype.initialize = function() {
 };
 
 E.prototype.show = function() {
-    lineOptions.r = map(sin(this.whenIGrew * 0.5), -1, 1, 0, 0.5);
-    lineOptions.g = map(sin(this.whenIGrew * 2), -1, 1, 1, 0);
-    lineOptions.b = map(sin(this.whenIGrew), -1, 1, 0, 1);
+    lineOptions.r = map(sin(2 + this.whenIGrew * 0.5), -1, 1, 0, 0.25);
+    lineOptions.g = map(sin(2 + this.whenIGrew * 2), -1, 1, 1, 0);
+    lineOptions.b = map(sin(2 + this.whenIGrew * 4), -1, 1, 0, 1);
     // weight: 8,
     lineOptions.weight = 8 * this.currentLength * zoom / 2;
     for (let i = 0; i <  this.branches.length; i++) {

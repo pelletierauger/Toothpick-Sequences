@@ -8,8 +8,8 @@ function setShaders() {
         varying vec4 vColor;
         void main(void) {
             gl_Position = vec4(coordinates, 1.0);
-            gl_Position.x = gl_Position.x / 1280.0;
-            gl_Position.y = gl_Position.y / 800.0;
+            gl_Position.x = gl_Position.x / 700.0;
+            gl_Position.y = gl_Position.y / 700.0;
             // gl_Position.x = gl_Position.x * (800.0 / 1280.0);
         vColor = color;
     }`;

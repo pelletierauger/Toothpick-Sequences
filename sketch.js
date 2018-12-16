@@ -2,7 +2,7 @@ let looping = true;
 let keysActive = true;
 let socket, cnvs, cnvs2, ctx, canvasDOM;
 let fileName = "./frames/sketch";
-let maxFrames = 20;
+let maxFrames = 625;
 let gl, shaderProgram;
 let vertices = [];
 let colors = [];
@@ -41,7 +41,7 @@ function setup() {
 
     // Clear the canvas
     gl.clearColor(0.6, 0.6, 0.6, 1.0);
-    // gl.clearColor(1, 1, 1, 1.0);
+    gl.clearColor(1, 1, 1, 1.0);
 
     // Enable the depth test
     gl.enable(gl.DEPTH_TEST);
@@ -93,6 +93,8 @@ function setup() {
     });
     es.push(e);
     es.push(e2);
+    es[0].currentLength = 1;
+    es[1].currentLength = 1;
 }
 let ww;
 
