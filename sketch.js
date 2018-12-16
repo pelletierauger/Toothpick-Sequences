@@ -8,12 +8,18 @@ let vertices = [];
 let colors = [];
 let indices = [];
 let amountOfLines = 0;
-let e;
+let e, e2;
+let zoom;
+let minX, maxX;
 
 function setup() {
     socket = io.connect('http://localhost:8080');
     pixelDensity(1);
     cnvs2 = createCanvas(windowWidth, windowHeight);
+    minX = -width / 2;
+    maxX = width / 2;
+    minX = 0;
+    maxX = 0;
     background(255, 0, 0);
     clear();
     ellipse(0, 0, 20);
@@ -34,8 +40,8 @@ function setup() {
     // gl.colorMask(false, false, false, true);
 
     // Clear the canvas
-    // gl.clearColor(0.6, 0.6, 0.6, 1.0);
-    gl.clearColor(1, 1, 1, 1.0);
+    gl.clearColor(0.6, 0.6, 0.6, 1.0);
+    // gl.clearColor(1, 1, 1, 1.0);
 
     // Enable the depth test
     gl.enable(gl.DEPTH_TEST);
@@ -71,27 +77,43 @@ function setup() {
         length: 50,
         numBranches: 3,
         angleBetween: TWO_PI /  6,
-        middle: true
+        middle: true,
+        parent: null
     });
-    es.push(e);
-    e = new E({
+
+    e2 = new E({
         x: 0,
         y: 0,
         angle: PI,
         length: 50,
         numBranches: 3,
         angleBetween: TWO_PI /  6,
-        middle: true
+        middle: true,
+        parent: null
     });
     es.push(e);
+    es.push(e2);
 }
 let ww;
 
+// let zoomDecr
+let increaser = 0.01;
+// let scale;
+
 function draw() {
+    // zoom *= 0.9979;
+    increaser *= 1.005;
+    if (es[0].hasGrown) {
+        zoom = width / (maxX - minX);
+    } else {
+        zoom = 12.8;
+    }
+    // console.log(zoom);
     // clear();
     translate(width / 2, height / 2);
-    scale(0.5, 0.5);
-
+    scale(zoom, zoom);
+    ellipse(minX, 0, 50);
+    ellipse(maxX, 0, 50);
 
     // fill(255);
     // ellipse(0, 0, 15);
@@ -202,11 +224,52 @@ function draw() {
 
     // makeLine(0, 0, 1280 - 10, 800 - 10);
 
-
+    let ready = 0;
     for (let i = 0; i < es.length; i++) {
-        // es[i].grow();
+        es[i].lengthen();
+        for (let j = 0; j < es[i].branches.length; j++) {
+
+            // console.log(es[i].branches[j].x);
+
+            // for (let i = 0; i < this.branches.length; i++) {
+            let b = es[i].branches[j];
+            let a = b.angle;
+            // console.log(a);
+            let x = es[i].pos.x + cos(a) * es[i].currentLength * es[i].length;
+            // let y = es[i].pos.y + sin(a) * es[i].currentLength * es[i].length;
+            minX = min(x, minX);
+            maxX = max(x, maxX);
+            // console.log(this.cu);
+            // makeLine(
+            //     this.pos.x * zoom,
+            //     this.pos.y * zoom,
+            //     x * zoom,
+            //     y * zoom
+            // );
+            // }
+
+
+        }
         es[i].show();
+        if (es[i].hasGrown || es[i].readyToGrow) {
+            ready++;
+        }
     }
+    if (ready == es.length) {
+        // console.log("GROWTH!");
+        grow();
+    } else {
+        // console.log("not ready to grow");
+    }
+    // for (let i = 0; i < es.length; i++) {
+    //     if (!es[i].hasGrown && es[i].readyToGrow) {
+    //         es[i].grow();
+    //     }
+    // }
+
+
+    // es[0].showTree();
+    // es[1].showTree();
 
     // var vertices = [-0.75, 0.0, 0.0, -0.5, -0.5, 0.0,
     //     0.75, 0.0, 0.0, 0.5, 0.5, 0.0
@@ -317,5 +380,4 @@ function grow() {
         es = es.concat(esNext);
         esNext = [];
     }
-
 }

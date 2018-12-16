@@ -5,12 +5,15 @@ let E = function(obj) {
     this.pos = createVector(obj.x, obj.y);
     this.angle = obj.angle;
     this.length = obj.length;
+    this.currentLength = 0;
     this.numBranches = obj.numBranches;
     this.angleBetween = obj.angleBetween;
     this.middle = obj.middle;
     this.branches = [];
-    this.whenIGrew = es.length;
+    this.whenIGrew = es.length * 0.1;
     this.hasGrown = false;
+    this.parent = obj.parent;
+    this.readyToGrow = false;
     this.initialize();
 };
 
@@ -18,7 +21,11 @@ E.prototype.initialize = function() {
     if (this.middle) {
         let x = this.pos.x + cos(this.angle) * this.length;
         let y = this.pos.y + sin(this.angle) * this.length;
-        this.branches.push(createVector(x, y, this.angle));
+        this.branches.push({
+            x: x,
+            y: y,
+            angle: this.angle
+        });
     }
     // If the shape has a middle segment, we need to substract it.
     let numberOfTimes = (this.middle) ? this.numBranches - 1 : this.numBranches;
@@ -27,13 +34,24 @@ E.prototype.initialize = function() {
             let a = this.angle + this.angleBetween;
             let x = this.pos.x + cos(a) * this.length;
             let y = this.pos.y + sin(a) * this.length;
-            this.branches.push(createVector(x, y, a));
+            this.branches.push({
+                x: x,
+                y: y,
+                angle: a
+            });
         } else {
             let a = this.angle - this.angleBetween;
             let x = this.pos.x + cos(a) * this.length;
             let y = this.pos.y + sin(a) * this.length;
-            this.branches.push(createVector(x, y, a));
+            this.branches.push({
+                x: x,
+                y: y,
+                angle: a
+            });
         }
+    }
+    for (let i = 0; i < this.branches.length; i++) {
+        this.branches[i].currentLength = this.currentLength;
     }
 };
 
@@ -41,25 +59,82 @@ E.prototype.show = function() {
     lineOptions.r = map(sin(this.whenIGrew * 0.5), -1, 1, 0, 0.5);
     lineOptions.g = map(sin(this.whenIGrew * 2), -1, 1, 1, 0);
     lineOptions.b = map(sin(this.whenIGrew), -1, 1, 0, 1);
-    // lineOptions.r = this.whenIGrew;
+    // weight: 8,
+    lineOptions.weight = 8 * this.currentLength * zoom / 2;
     for (let i = 0; i <  this.branches.length; i++) {
-        makeLine(this.pos.x, this.pos.y, this.branches[i].x, this.branches[i].y);
+        let b = this.branches[i];
+        let a = b.angle;
+        // console.log(a);
+        let x = this.pos.x + cos(a) * this.currentLength * this.length;
+        let y = this.pos.y + sin(a) * this.currentLength * this.length;
+        // console.log(this.cu);
+        makeLine(
+            this.pos.x * zoom,
+            this.pos.y * zoom,
+            x * zoom,
+            y * zoom
+        );
+    }
+};
+
+
+// E.prototype.getSizes = function() {
+
+// };
+
+E.prototype.showTree = function() {
+    lineOptions.r = map(sin(this.whenIGrew * 0.5), -1, 1, 0, 0.5);
+    lineOptions.g = map(sin(this.whenIGrew * 2), -1, 1, 1, 0);
+    lineOptions.b = map(sin(this.whenIGrew), -1, 1, 0, 1);
+    // lineOptions.r = this.whenIGrew;
+    for (let i = 0; i < this.branches.length; i++) {
+        if (this.parent) {
+            // console.log("oh yes!");
+            makeLine(this.pos.x - this.parent.x * this.parent.currentLength,
+                this.pos.y - this.parent.y * this.parent.currentLength,
+                this.branches[i].x * this.currentLength - this.parent.x * this.parent.currentLength,
+                this.branches[i].y * this.currentLength - this.parent.y * this.parent.currentLength
+            );
+        } else {
+            makeLine(this.pos.x, this.pos.y, this.branches[i].x * this.currentLength, this.branches[i].y * this.currentLength);
+        }
+        if (this.branches[i].child) {
+            this.branches[i].child.showTree();
+        }
+    }
+};
+
+
+E.prototype.lengthen = function() {
+    if (!this.readyToGrow) {
+        if (this.currentLength < 1) {
+            this.currentLength += increaser;
+            for (let i = 0; i < this.branches.length; i++) {
+                this.branches[i].currentLength = this.currentLength;
+            }
+        }
+        if (this.currentLength >= 1) {
+            this.readyToGrow = true;
+            // this.grow();
+            // console.log("GRow");
+        }
     }
 };
 
 E.prototype.grow = function() {
     if (!this.hasGrown) {
         // console.log("I'm growing!");
-        for (let i = 0; i <  this.branches.length; i++) {
+        for (let i = 0; i < this.branches.length; i++) {
             let b = this.branches[i];
             let testBranch = new E({
                 x: b.x,
                 y: b.y,
-                angle: b.z,
+                angle: b.angle,
                 length: this.length,
                 numBranches: this.numBranches,
                 angleBetween: this.angleBetween,
-                middle: this.middle
+                middle: this.middle,
+                parent: this.branches[i]
             });
             let branchApproved = true;
             for (let j = 0; j < testBranch.branches.length; j++) {
@@ -88,6 +163,7 @@ E.prototype.grow = function() {
             }
             if (branchApproved) {
                 esNext.push(testBranch);
+                this.branches[i].child = testBranch;
                 // console.log("Branch approved.");
             } else {
                 // console.log("Branch denied.");
@@ -96,5 +172,4 @@ E.prototype.grow = function() {
         }
         this.hasGrown = true;
     }
-
 };
