@@ -1,5 +1,5 @@
 let lineOptions = {
-    weight: 2,
+    weight: 8,
     blurFactor: 2,
     r: 0.0,
     g: 0.0,

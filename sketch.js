@@ -1,6 +1,6 @@
 let looping = true;
 let keysActive = true;
-let socket, cnvs, ctx, canvasDOM;
+let socket, cnvs, cnvs2, ctx, canvasDOM;
 let fileName = "./frames/sketch";
 let maxFrames = 20;
 let gl, shaderProgram;
@@ -13,8 +13,12 @@ let e;
 function setup() {
     socket = io.connect('http://localhost:8080');
     pixelDensity(1);
-    // cnvs = createCanvas(windowWidth, windowWidth / 16 * 9, WEBGL);
+    cnvs2 = createCanvas(windowWidth, windowHeight);
+    background(255, 0, 0);
+    clear();
+    ellipse(0, 0, 20);
     noCanvas();
+    textSize(25);
     cnvs = document.getElementById('my_Canvas');
     gl = cnvs.getContext('webgl', { preserveDrawingBuffer: true });
     // canvasDOM = document.getElementById('my_Canvas');
@@ -30,7 +34,8 @@ function setup() {
     // gl.colorMask(false, false, false, true);
 
     // Clear the canvas
-    gl.clearColor(0.6, 0.6, 0.6, 1.0);
+    // gl.clearColor(0.6, 0.6, 0.6, 1.0);
+    gl.clearColor(1, 1, 1, 1.0);
 
     // Enable the depth test
     gl.enable(gl.DEPTH_TEST);
@@ -52,9 +57,10 @@ function setup() {
 
 
     frameRate(30);
-    background(0);
-    fill(255, 50);
-    noStroke();
+    // background(0);
+    fill(255);
+    // stroke
+    // noStroke();
     if (!looping) {
         noLoop();
     }
@@ -62,25 +68,36 @@ function setup() {
         x: 0,
         y: 0,
         angle: 0,
-        length: 100,
+        length: 50,
         numBranches: 3,
         angleBetween: TWO_PI /  6,
         middle: true
     });
     es.push(e);
-    // e = new E({
-    //     x: 0,
-    //     y: 0,
-    //     angle: PI,
-    //     length: 100,
-    //     numBranches: 3,
-    //     angleBetween: TWO_PI /  6,
-    //     middle: true
-    // });
+    e = new E({
+        x: 0,
+        y: 0,
+        angle: PI,
+        length: 50,
+        numBranches: 3,
+        angleBetween: TWO_PI /  6,
+        middle: true
+    });
+    es.push(e);
 }
 let ww;
 
 function draw() {
+    // clear();
+    translate(width / 2, height / 2);
+    scale(0.5, 0.5);
+
+
+    // fill(255);
+    // ellipse(0, 0, 15);
+    // ellipse(-100, 0, 15);
+
+
     ww = map(sin(frameCount * 0.05), -1, 1, 0.05, 1);
     rectangles = 0;
 
@@ -292,10 +309,13 @@ function keyPressed() {
 }
 
 function grow() {
-    let numToGrow = es.length
-    for (let i = 0; i < numToGrow; i++) {
-        es[i].grow();
+    for (let i = 0; i < 1; i++) {
+        let numToGrow = es.length;
+        for (let i = 0; i < numToGrow; i++) {
+            es[i].grow();
+        }
+        es = es.concat(esNext);
+        esNext = [];
     }
-    es = es.concat(esNext);
-    esNext = [];
+
 }
