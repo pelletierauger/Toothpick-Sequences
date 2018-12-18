@@ -1,7 +1,7 @@
 let looping = true;
 let keysActive = true;
 let socket, cnvs, cnvs2, ctx, canvasDOM;
-let fileName = "./frames/sketch";
+let fileName = "./frames/3/sketch";
 let maxFrames = 625;
 let gl, shaderProgram;
 let vertices = [];
@@ -11,24 +11,42 @@ let amountOfLines = 0;
 let e, e2;
 let zoom;
 let minX, maxX;
+let generation = 0;
+var cols = [{
+    offset: 0,
+    r: 255,
+    g: 255,
+    b: 255
+}, {
+    offset: 0.7,
+    r: 0,
+    g: 255,
+    b: 255
+}, {
+    offset: 0.8,
+    r: 0,
+    g: 255,
+    b: 255
+}];
 
 function setup() {
     socket = io.connect('http://localhost:8080');
     pixelDensity(1);
-    cnvs2 = createCanvas(windowWidth, windowHeight);
+    cnvs = createCanvas(800, 800);
+    ctx = cnvs.drawingContext;
     minX = -width / 2;
     maxX = width / 2;
     minX = 0;
     maxX = 0;
     background(255, 0, 0);
     clear();
-    ellipse(0, 0, 20);
-    noCanvas();
+    // ellipse(0, 0, 20);
+    // noCanvas();
     textSize(25);
-    cnvs = document.getElementById('my_Canvas');
-    gl = cnvs.getContext('webgl', { preserveDrawingBuffer: true });
+    // cnvs = document.getElementById('my_Canvas');
+    // gl = cnvs.getContext('webgl', { preserveDrawingBuffer: true });
     // canvasDOM = document.getElementById('my_Canvas');
-    // canvasDOM = document.getElementById('defaultCanvas0');
+    canvasDOM = document.getElementById('defaultCanvas0');
     // gl = canvasDOM.getContext('webgl');
     // gl = cnvs.drawingContext;
 
@@ -40,33 +58,35 @@ function setup() {
     // gl.colorMask(false, false, false, true);
 
     // Clear the canvas
-    gl.clearColor(0.6, 0.6, 0.6, 1.0);
-    gl.clearColor(1, 1, 1, 1.0);
+    // gl.clearColor(0.6, 0.6, 0.6, 1.0);
+    // gl.clearColor(0, 1, 1, 1.0);
 
-    // Enable the depth test
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthMask(false);
+    // // Enable the depth test
+    // gl.enable(gl.DEPTH_TEST);
+    // gl.depthMask(false);
 
-    // Clear the color buffer bit
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.colorMask(true, true, true, true);
+    // // Clear the color buffer bit
     // gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.enable(gl.BLEND);
-    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
-    // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
+    // // gl.colorMask(true, true, true, true);
+    // // gl.clear(gl.COLOR_BUFFER_BIT);
+    // gl.enable(gl.BLEND);
+    // // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    // // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
+    // // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
 
-    // Set the view port
-    gl.viewport(0, 0, cnvs.width, cnvs.height);
+    // // Set the view port
+    // gl.viewport(0, 0, cnvs.width, cnvs.height);
 
 
     frameRate(30);
-    // background(0);
+    background(0, 255, 255);
     fill(255);
     // stroke
     // noStroke();
+    strokeWeight(4);
+    stroke(0, 0, 255);
     if (!looping) {
         noLoop();
     }
@@ -108,14 +128,18 @@ function draw() {
     if (es[0].hasGrown) {
         zoom = width / (maxX - minX);
     } else {
-        zoom = 12.8;
+        zoom = 8;
     }
     // console.log(zoom);
+    background(0, 255, 255);
+
     // clear();
     translate(width / 2, height / 2);
-    scale(zoom, zoom);
-    ellipse(minX, 0, 50);
-    ellipse(maxX, 0, 50);
+    noStroke();
+    printBackgroundGradient();
+    // scale(zoom, zoom);
+    // ellipse(minX, 0, 50);
+    // ellipse(maxX, 0, 50);
 
     // fill(255);
     // ellipse(0, 0, 15);
@@ -284,65 +308,65 @@ function draw() {
     // indices = rectangle.indices;
     // console.log(indices);
 
-    // Create an empty buffer object and store vertex data
-    var vertex_buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    // // Create an empty buffer object and store vertex data
+    // var vertex_buffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    // gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-    // Create an empty buffer object and store Index data
-    var Index_Buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Index_Buffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    // // Create an empty buffer object and store Index data
+    // var Index_Buffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Index_Buffer);
+    // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
-    // Create an empty buffer object and store color data
-    var color_buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
+    // // Create an empty buffer object and store color data
+    // var color_buffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
 
-    setShaders();
-    /* ======== Associating shaders to buffer objects =======*/
+    // setShaders();
+    // /* ======== Associating shaders to buffer objects =======*/
 
-    // Bind vertex buffer object
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
+    // // Bind vertex buffer object
+    // gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
 
-    // Bind index buffer object
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Index_Buffer);
+    // // Bind index buffer object
+    // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Index_Buffer);
 
-    // Get the attribute location
-    var coord = gl.getAttribLocation(shaderProgram, "coordinates");
+    // // Get the attribute location
+    // var coord = gl.getAttribLocation(shaderProgram, "coordinates");
 
-    // point an attribute to the currently bound VBO
-    gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
+    // // point an attribute to the currently bound VBO
+    // gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
 
-    // Enable the attribute
-    gl.enableVertexAttribArray(coord);
+    // // Enable the attribute
+    // gl.enableVertexAttribArray(coord);
 
-    // bind the color buffer
-    gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
+    // // bind the color buffer
+    // gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
 
-    // get the attribute location
-    var color = gl.getAttribLocation(shaderProgram, "color");
+    // // get the attribute location
+    // var color = gl.getAttribLocation(shaderProgram, "color");
 
-    // point attribute to the volor buffer object
-    gl.vertexAttribPointer(color, 4, gl.FLOAT, false, 0, 0);
+    // // point attribute to the volor buffer object
+    // gl.vertexAttribPointer(color, 4, gl.FLOAT, false, 0, 0);
 
-    // enable the color attribute
-    gl.enableVertexAttribArray(color);
+    // // enable the color attribute
+    // gl.enableVertexAttribArray(color);
 
-    /*============Drawing the Quad====================*/
+    // /*============Drawing the Quad====================*/
+    // // gl.clear(gl.COLOR_BUFFER_BIT);
+    // // gl.colorMask(false, false, false, true);
+    // // gl.clearColor(0.0, 0.0, 0.0, 1.0);
     // gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.colorMask(false, false, false, true);
-    // gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    // gl.colorMask(true, true, true, true);
-    // gl.enable(gl.BLEND);
-    // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
-    //Draw the triangle
-    gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+    // // gl.colorMask(true, true, true, true);
+    // // gl.enable(gl.BLEND);
+    // // gl.blendFunc(gl.SRC_ALPHA, gl.DST_ALPHA);
+    // //Draw the triangle
+    // gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
-    if (exporting && frameCount < maxFrames) {
+    if (exporting && frameCount >= 80 && frameCount < 480) {
         frameExport();
     }
 }
@@ -374,6 +398,7 @@ function keyPressed() {
 }
 
 function grow() {
+    generation++;
     for (let i = 0; i < 1; i++) {
         let numToGrow = es.length;
         for (let i = 0; i < numToGrow; i++) {
@@ -382,4 +407,15 @@ function grow() {
         es = es.concat(esNext);
         esNext = [];
     }
+
+}
+
+function printBackgroundGradient() {
+    var gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, width);
+    // var cols = globalValues.gradient;
+    for (var i = 0; i < cols.length; i++) {
+        gradient.addColorStop(cols[i].offset, "rgba(" + cols[i].r + ", " + cols[i].g + ", " + cols[i].b + ",1)");
+    }
+    ctx.fillStyle = gradient;
+    rect(-width * 0.5, -height * 0.5, width, height);
 }

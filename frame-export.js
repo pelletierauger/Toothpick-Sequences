@@ -10,15 +10,23 @@ for (let i = 0; i < query.length; i++) {
 
 let exporting = (GET["exporting"] && GET["exporting"] == "true") ? true : false;
 
+let exportedFrame = 1;
+let realFrame = 1;
+
 function frameExport() {
-    var formattedFrameCount = "" + frameCount;
-    while (formattedFrameCount.length < 5) {
-        formattedFrameCount = "0" + formattedFrameCount;
+    if (exportedFrame % 2 !== 0) {
+        // let f = frameCount - 79;
+        var formattedFrameCount = "" + realFrame;
+        while (formattedFrameCount.length < 5) {
+            formattedFrameCount = "0" + formattedFrameCount;
+        }
+        var dataUrl = canvasDOM.toDataURL();
+        var data = {
+            dataUrl: dataUrl,
+            name: fileName + "-" + formattedFrameCount
+        }
+        socket.emit('image', data);
+        realFrame++;
     }
-    var dataUrl = cnvs.toDataURL();
-    var data = {
-        dataUrl: dataUrl,
-        name: fileName + "-" + formattedFrameCount
-    }
-    socket.emit('image', data);
+    exportedFrame++;
 }

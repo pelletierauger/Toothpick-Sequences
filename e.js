@@ -15,6 +15,7 @@ let E = function(obj) {
     this.parent = obj.parent;
     this.readyToGrow = false;
     this.initialize();
+    this.generation = generation;
 };
 
 E.prototype.initialize = function() {
@@ -56,9 +57,24 @@ E.prototype.initialize = function() {
 };
 
 E.prototype.show = function() {
-    lineOptions.r = map(sin(2 + this.whenIGrew * 0.5), -1, 1, 0, 0.25);
-    lineOptions.g = map(sin(2 + this.whenIGrew * 2), -1, 1, 1, 0);
-    lineOptions.b = map(sin(2 + this.whenIGrew * 4), -1, 1, 0, 1);
+    let r = map(sin(2 + this.whenIGrew * 0.5), -1, 1, 1, 0.25) * 255;
+    let g = map(sin(2 + this.whenIGrew * 2), -1, 1, 1, 0) * 255;
+    let b = map(sin(2 + this.whenIGrew * 4), -1, 1, 0, 1) * 255;
+    stroke(r, g, b);
+    let colArray = [
+        [0, 95, 205],
+        [15, 195, 155],
+        [25, 220, 0],
+        [0, 150, 5],
+        [0, 0, 255],
+        [0, 0, 255],
+        [0, 0, 255],
+        [0, 0, 255],
+        [0, 0, 255],
+        [0, 0, 255],
+        [0, 0, 255],
+    ];
+    stroke(colArray[this.generation % 4]);
     // weight: 8,
     lineOptions.weight = 8 * this.currentLength * zoom / 2;
     for (let i = 0; i <  this.branches.length; i++) {
@@ -68,12 +84,17 @@ E.prototype.show = function() {
         let x = this.pos.x + cos(a) * this.currentLength * this.length;
         let y = this.pos.y + sin(a) * this.currentLength * this.length;
         // console.log(this.cu);
-        makeLine(
-            this.pos.x * zoom,
-            this.pos.y * zoom,
-            x * zoom,
-            y * zoom
-        );
+        // makeLine(
+        //     this.pos.x * zoom,
+        //     this.pos.y * zoom,
+        //     x * zoom,
+        //     y * zoom
+        // );
+        strokeWeight(map(zoom, 8, 0, 46, 2));
+        line(this.pos.x * zoom * 0.9,
+            this.pos.y * zoom * 0.9,
+            x * zoom * 0.9,
+            y * zoom * 0.9);
     }
 };
 
@@ -138,7 +159,7 @@ E.prototype.grow = function() {
             });
             let branchApproved = true;
             for (let j = 0; j < testBranch.branches.length; j++) {
-                line(testBranch.pos.x, testBranch.pos.y, testBranch.branches[j].x, testBranch.branches[j].y);
+                // line(testBranch.pos.x, testBranch.pos.y, testBranch.branches[j].x, testBranch.branches[j].y);
                 // fill(0, 50);
                 // text(testBranch.angle, testBranch.pos.x, testBranch.pos.y);
                 for (let k = 0; k < es.length; k++) {
@@ -148,12 +169,12 @@ E.prototype.grow = function() {
                         let d = dist(thisB.x, thisB.y, otherB.x, otherB.y);
                         if (d <= 0.1) {
                             // console.log(j, k, l);
-                            fill(255, 0, 0);
-                            ellipse(otherB.x, otherB.y, 15);
-                            fill(255, 255, 0, 150);
-                            ellipse(thisB.x, thisB.y, 35);
-                            fill(0, 255, 255, 150);
-                            ellipse(testBranch.pos.x, testBranch.pos.y, 55);
+                            // fill(255, 0, 0);
+                            // ellipse(otherB.x, otherB.y, 15);
+                            // fill(255, 255, 0, 150);
+                            // ellipse(thisB.x, thisB.y, 35);
+                            // fill(0, 255, 255, 150);
+                            // ellipse(testBranch.pos.x, testBranch.pos.y, 55);
 
                             // console.log(otherB, thisB);
                             branchApproved = false;
