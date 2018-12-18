@@ -1,1 +1,21 @@
 ffmpeg -f image2 -framerate 24 -i ./frames/sketch-%05d.png -s 800x800 ./snowflake.gif
+
+ffmpeg -f image2 -framerate 24 -i ./frames/2/sketch-%05d.png -s 800x800 ./snowflake2.gif
+
+ffmpeg -f image2 -framerate 30 -i ./frames/2/sketch-%05d.png -c:v libx264 -s 800x800 -pix_fmt yuv420p ./snowflake3.mp4
+
+ffmpeg -f image2 -framerate 60 -i ./frames/2/sketch-%05d.png -c:v libx264 -s 800x800 -pix_fmt yuv420p ./snowflake3-60fps.mp4
+
+ffmpeg -f image2 -framerate 30 -i ./frames/3/sketch-%05d.png -c:v libx264 -s 800x800 -pix_fmt yuv420p ./snowflake3-2xpeed-30fps.mp4
+
+ffmpeg -f image2 -framerate 1 -i ./frames/debugging/%05d.png -s 800x800 ./debugging.gif
+
+
+ffmpeg -f image2 -framerate 24 -i ./frames/debugging/%05d.png -vf palettegen ./debugging-palette.png
+
+ffmpeg -f image2 -framerate 1 -i ./frames/debugging/%05d.png -i ./debugging-palette.png -lavfi paletteuse -s 1600x1600 ./debugging-1600x1600.gif
+
+
+ffmpeg -f image2 -framerate 24 -i ./frames/3/sketch-%05d.png -vf palettegen ./snowflake-palette.png
+
+ffmpeg -f image2 -framerate 30 -i ./frames/3/sketch-%05d.png -i ./snowflake-palette.png -lavfi paletteuse -s 1600x1600 ./snowflake3-1600x1600.gif
